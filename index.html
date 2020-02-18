@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width">
-    <title>Service is running...</title>
+    <title>Maintenance</title>
     <style>
       * {margin: 0; padding: 0;}
       body {background: black;}
@@ -45,28 +45,29 @@
     <canvas id="c"></canvas>
     <script type="text/javascript">
 
-      ;(function(id){
-        var c = document.getElementById(id);
-        var ctx = c.getContext("2d");
+      // matrix background
+      ;((id) => {
+        const c = document.getElementById(id);
+        const ctx = c.getContext('2d');
         c.height = window.innerHeight;
         c.width = window.innerWidth;
-        var s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        var a = s.split('');
-        var font_size = 10;
-        var columns = c.width/font_size;
-        var drops = [];
-        for(var x = 0; x < columns; x++){
+        const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const a = s.split('');
+        const fontSize = 10;
+        const columns = c.width / fontSize;
+        const drops = [];
+        for (let x = 0; x < columns; x++) {
           drops[x] = 1;
         }
-        function draw(){
-          ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        const draw = () => {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
           ctx.fillRect(0, 0, c.width, c.height);
-          ctx.fillStyle = "#0F0";
-          ctx.font = font_size + "px arial";
-          for(var i = 0; i < drops.length; i++){
-            var text = a[Math.floor(Math.random()*a.length)];
-            ctx.fillText(text, i*font_size, drops[i]*font_size);
-            if(drops[i]*font_size > c.height && Math.random() > 0.975){
+          ctx.fillStyle = '#0F0';
+          ctx.font = `${fontSize} px arial`;
+          for (let i = 0; i < drops.length; i++) {
+            const text = a[Math.floor(Math.random() * a.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > c.height && Math.random() > 0.975) {
               drops[i] = 0;
             }
             drops[i]++;
@@ -75,60 +76,62 @@
         setInterval(draw, 33);
       })('c');
 
-      var getDeadline = function(minutes){
-        var n = new Date();
-        var t = n.getTime();
-        var m = minutes || 30;
-        n.setTime(t + m * 6e4);
-        return n.getTime();
+      // count down
+      const setCounter = (elid, deadline) => {
+        const container = document.getElementById(elid);
+        const endTime = (new Date(deadline)).getTime();
+        const nsInSec = 1000;
+        const nsInMin = nsInSec * 60;
+        const nsInHour = nsInMin * 60;
+        const nsInDay = nsInHour * 24;
+
+        const format = function(num, noun, previous = 0){
+          return num > 1 ? `${num} ${noun}s` : num > 0 || previous > 0 ? `${num} ${noun}` : '';
+        }
+
+        const recalculate = () => {
+          const current = (new Date()).getTime();
+          let distance = endTime - current;
+
+          const dayDiff = distance > nsInDay ? Math.floor(distance / nsInDay) : 0;
+          distance -= dayDiff * nsInDay;
+
+          const hourDiff = distance > nsInHour ? Math.floor(distance / nsInHour) : 0;
+          distance -= hourDiff * nsInHour;
+
+          const minDiff = distance > nsInMin ? Math.floor(distance / nsInMin) : 0;
+          distance -= minDiff * nsInMin;
+
+          const secDiff = distance > nsInSec ? Math.floor(distance / nsInSec) : 0;
+          distance -= secDiff * nsInSec;
+
+          return [
+            dayDiff,
+            hourDiff,
+            minDiff,
+            secDiff
+          ];
+        }
+
+        const update = () => {
+          const re = recalculate();
+          const arr = [
+            format(re[0], 'day'),
+            format(re[1], 'hour', re[0]),
+            format(re[2], 'minute', re[1]),
+            format(re[3], 'second', re[2])
+          ];
+
+          const txt = arr.join(' ');
+          container.innerHTML = txt;
+          setTimeout(update, 1e3);
+        }
+
+        update();
       }
 
-      var setCounter = function(id, deadline){
-        var c = document.getElementById(id);
-
-        var dl = deadline || getDeadline(30);
-
-        var plurize = function(n, pl, si){
-          return n + ' ' + (n > 1 ? pl : si);
-        }
-        var update = function(){
-          var t = (new Date()).getTime();
-          var remainSeconds = Math.round((dl - t) / 1000);
-          var remainMinutes = 0;
-          var remainHours = 0;
-          if(remainSeconds > 60){
-            remainMinutes = Math.round(remainSeconds / 60);
-            remainSeconds = remainSeconds % 60;
-            if(remainMinutes > 60){
-              remainHours = Math.round(remainMinutes / 60);
-              remainMinutes = remainMinutes % 60;
-            }
-          }
-          var a = [];
-          if(remainHours > 0){
-            a.push(plurize(remainHours, 'hours', 'hour'));
-          }
-          if(remainMinutes > 0){
-            a.push(plurize(remainMinutes, 'minutes', 'minute'));
-          }
-          if(remainSeconds > 0){
-            a.push(plurize(remainSeconds, 'seconds', 'second'));
-          }
-          if(a.length > 0){
-            a.unshift('Coming back in');
-            c.innerHTML = a.join(' ');
-          }
-        }
-        setInterval(update, 1e3);
-      }
-
-      // var miliseconds = getDeadline(30);
-      // console.log(miliseconds);
-
-      // setCounter: interval counting
-      // @param: elementId
-      // @param: timestamp of the deadline, in milisecond
-      setCounter('comingTime', undefined);
+      const DEADLINE = '02/24/2020 7:50:00 GMT+0';
+      setCounter('comingTime', DEADLINE);
     </script>
   </body>
 </html>

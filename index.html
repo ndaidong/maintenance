@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width">
-    <title>Maintenance</title>
+    <title>Coming Soon</title>
     <style>
       * {margin: 0; padding: 0;}
       body {background: black;}
@@ -17,35 +17,34 @@
         transform: translate(-50%, -50%);
       }
       .centered h1{
-        margin-top: 20px;
+        margin: 20px auto;
         color: #0ff;
-        font-size: 35px;
+        font-size: 42px;
         text-transform: uppercase;
         text-shadow: 2px 3px 4px #000;
       }
       .centered h2{
+        margin: 20px auto;
         color: #fff;
-        font-size: 25px;
+        font-size: 18px;
         text-shadow: 2px 3px 4px #000;
       }
       .centered h3{
-        margin-top: 20px;
+        margin: 20px auto;
         color: #ff6;
-        font-size: 22px;
+        font-size: 18px;
         text-shadow: 2px 3px 4px #000;
       }
     </style>
   </head>
   <body>
     <div class="centered">
-      <h2>Website currently</h2>
-      <h1>under maintenance</h1>
-      <h3 id="comingTime">&nbsp;</h3>
+      <h1>Coming Soon</h1>
+      <h2>Our website is currently undergoing scheduled maintenance.</h2>
+      <h3>We should be back shortly. Thank you for your patience.</h3>
     </div>
     <canvas id="c"></canvas>
     <script type="text/javascript">
-
-      // matrix background
       ;((id) => {
         const c = document.getElementById(id);
         const ctx = c.getContext('2d');
@@ -75,63 +74,6 @@
         }
         setInterval(draw, 33);
       })('c');
-
-      // count down
-      const setCounter = (elid, deadline) => {
-        const container = document.getElementById(elid);
-        const endTime = (new Date(deadline)).getTime();
-        const nsInSec = 1000;
-        const nsInMin = nsInSec * 60;
-        const nsInHour = nsInMin * 60;
-        const nsInDay = nsInHour * 24;
-
-        const format = function(num, noun, previous = 0){
-          return num > 1 ? `${num} ${noun}s` : num > 0 || previous > 0 ? `${num} ${noun}` : '';
-        }
-
-        const recalculate = () => {
-          const current = (new Date()).getTime();
-          let distance = endTime - current;
-
-          const dayDiff = distance > nsInDay ? Math.floor(distance / nsInDay) : 0;
-          distance -= dayDiff * nsInDay;
-
-          const hourDiff = distance > nsInHour ? Math.floor(distance / nsInHour) : 0;
-          distance -= hourDiff * nsInHour;
-
-          const minDiff = distance > nsInMin ? Math.floor(distance / nsInMin) : 0;
-          distance -= minDiff * nsInMin;
-
-          const secDiff = distance > nsInSec ? Math.floor(distance / nsInSec) : 0;
-          distance -= secDiff * nsInSec;
-
-          return [
-            dayDiff,
-            hourDiff,
-            minDiff,
-            secDiff
-          ];
-        }
-
-        const update = () => {
-          const re = recalculate();
-          const arr = [
-            format(re[0], 'day'),
-            format(re[1], 'hour', re[0]),
-            format(re[2], 'minute', re[1]),
-            format(re[3], 'second', re[2])
-          ];
-
-          const txt = arr.join(' ');
-          container.innerHTML = txt;
-          setTimeout(update, 1e3);
-        }
-
-        update();
-      }
-
-      const DEADLINE = '02/24/2020 7:50:00 GMT+0';
-      setCounter('comingTime', DEADLINE);
     </script>
   </body>
 </html>
